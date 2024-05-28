@@ -17,6 +17,7 @@
 - **State Management for Pagination**: Implement state management to loop through all movies that match certain parameters using the API's pagination.
 - **Remove Watched Movies**: Allow users to remove movies from their watched list.
 - **Dynamic Movie Recommendations**: Re-generate the suggested movies list when the user adds or removes a movie.
+- **Clear Code**: Refactor the code to ease the use and future updates.
 
 ### Future Enhancements
 - **Movie Plot Details**: Allow users to select a suggested movie and read its plot.
