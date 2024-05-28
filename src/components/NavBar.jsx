@@ -1,6 +1,9 @@
 export default function NavBar(props) {
-  const { query, setQuery } = props;
-
+  const { query, setQuery, setPage } = props;
+  function evHandle(e) {
+    setQuery(e.target.value);
+    setPage(1);
+  }
   return (
     <nav className="nav-bar">
       <div className="logo">
@@ -12,7 +15,7 @@ export default function NavBar(props) {
         type="text"
         placeholder="Search movies..."
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => evHandle(e)}
       />
       {/* <p className="num-results">
         Found <strong>{movies.length}</strong> results

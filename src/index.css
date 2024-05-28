@@ -1,3 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 :root {
   --color-primary: #78bd86;
   --color-primary-light: #1a763d;
@@ -54,9 +57,16 @@ body {
   max-width: 42rem;
   background-color: var(--color-background-500);
   border-radius: 0.9rem;
-  overflow: scroll;
+  overflow: auto;
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+  transition: scrollbar-color 0.3s ease;
   overflow-x: hidden;
   position: relative;
+}
+.box:hover {
+  scrollbar-color: rgba(0, 0, 0, 0.5) transparent;
+  opacity: 1;
 }
 
 .loader {

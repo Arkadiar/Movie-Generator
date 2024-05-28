@@ -21,13 +21,13 @@ export default function MovElementLi({
 
       // Log the raw response for debugging
       const responseText = await response.text();
-      console.log("Response text:", responseText);
+      // console.log("Response text:", responseText);
 
       // Check if the response is valid JSON
       let detailedMovie;
       try {
         detailedMovie = JSON.parse(responseText);
-        setCheckLength((curr) => curr + 1);
+        // setCheckLength((curr) => curr + 1);
       } catch (parseError) {
         console.error("Failed to parse JSON:", parseError);
         setError("Failed to parse JSON response");
@@ -49,7 +49,7 @@ export default function MovElementLi({
   }
 
   return (
-    <li onClick={clickMovie} className="listElement" key={movie.imdbID}>
+    <li onClick={() => clickMovie()} className="listElement" key={movie.imdbID}>
       <img src={movie.Poster} alt={`${movie.Title} poster`} />
       <h3>{movie.Title}</h3>
       <div>

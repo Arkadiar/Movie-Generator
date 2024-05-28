@@ -15,10 +15,10 @@ export default function App() {
   const [isOpen1, setIsOpen1] = useState(true);
   const [isOpen2, setIsOpen2] = useState(true);
   const [isOpen3, setIsOpen3] = useState(true);
-  const [checkLength, setCheckLength] = useState(0);
+  const [page, setPage] = useState(1);
 
   const movieCaller = async () => {
-    const url = `http://www.omdbapi.com/?s=${query}&page=${4}&apikey=855effac`;
+    const url = `http://www.omdbapi.com/?s=${query}&page=${page}&apikey=855effac`;
 
     if (query.length >= 3) {
       const response = await fetch(url);
@@ -26,20 +26,24 @@ export default function App() {
 
       if (responseJSON.Search) {
         setMovies(responseJSON.Search);
+        console.log(responseJSON);
       }
     }
   };
+  function nextPage() {
+    setPage((prevPage) => prevPage + 1);
+  }
+  function prevPage() {
+    if (page !== 1) setPage((prevPage) => prevPage - 1);
+  }
 
   useEffect(() => {
-    if (!query) {
-      return;
-    }
     movieCaller(query);
-  }, [query]);
+  }, [query, page]);
 
   return (
     <>
-      <NavBar query={query} setQuery={setQuery}></NavBar>
+      <NavBar setPage={setPage} query={query} setQuery={setQuery}></NavBar>
 
       <main className="main">
         <div className="box">
@@ -48,13 +52,31 @@ export default function App() {
             <ul className="list">
               {movies?.map((movie, i) => (
                 <MovElementLi
-                  setCheckLength={setCheckLength}
+                  // setCheckLength={setCheckLength}
                   watched={watched}
                   setWatched={setWatched}
                   key={i}
                   movie={movie}
                 />
               ))}
+              {movies.length === 0 ? (
+                ""
+              ) : (
+                <div className="flex justify-between">
+                  <button
+                    onClick={() => prevPage()}
+                    className="text-2xl bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded "
+                  >
+                    Previous Page
+                  </button>
+                  <button
+                    onClick={() => nextPage()}
+                    className="text-2xl bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded "
+                  >
+                    Next Page
+                  </button>
+                </div>
+              )}
             </ul>
           )}
         </div>
