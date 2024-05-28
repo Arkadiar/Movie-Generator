@@ -2,13 +2,11 @@ import { useState, useEffect } from "react";
 import NavBar from "./components/NavBar";
 import OverlayButton from "./components/Button";
 import MovElementLi from "./components/MovElement";
-
-const tempMovieData = [];
-
-const tempWatchedData = [];
+import Summary from "./components/summary";
+// `http://www.omdbapi.com/?i=${responseJSON.Search.imdbID}&apikey=855effac`
 
 const average = (arr) =>
-  arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
+  arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0).toFixed(2);
 
 export default function App() {
   const [query, setQuery] = useState("");
@@ -16,9 +14,12 @@ export default function App() {
   const [watched, setWatched] = useState([]);
   const [isOpen1, setIsOpen1] = useState(true);
   const [isOpen2, setIsOpen2] = useState(true);
+  const [isOpen3, setIsOpen3] = useState(true);
+  const [checkLength, setCheckLength] = useState(0);
 
   const movieCaller = async () => {
-    const url = `http://www.omdbapi.com/?s=${query}&apikey=855effac`;
+    const url = `http://www.omdbapi.com/?s=${query}&page=${4}&apikey=855effac`;
+
     if (query.length >= 3) {
       const response = await fetch(url);
       const responseJSON = await response.json();
@@ -26,17 +27,15 @@ export default function App() {
       if (responseJSON.Search) {
         setMovies(responseJSON.Search);
       }
-      console.log(responseJSON);
     }
   };
 
   useEffect(() => {
+    if (!query) {
+      return;
+    }
     movieCaller(query);
   }, [query]);
-
-  const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
-  const avgUserRating = average(watched.map((movie) => movie.userRating));
-  const avgRuntime = average(watched.map((movie) => movie.runtime));
 
   return (
     <>
@@ -48,7 +47,13 @@ export default function App() {
           {isOpen1 && (
             <ul className="list">
               {movies?.map((movie, i) => (
-                <MovElementLi key={i} movie={movie} />
+                <MovElementLi
+                  setCheckLength={setCheckLength}
+                  watched={watched}
+                  setWatched={setWatched}
+                  key={i}
+                  movie={movie}
+                />
               ))}
             </ul>
           )}
@@ -58,27 +63,7 @@ export default function App() {
           <OverlayButton open={isOpen2} setOpen={setIsOpen2}></OverlayButton>
           {isOpen2 && (
             <>
-              <div className="summary">
-                <h2>Movies you watched</h2>
-                <div>
-                  <p>
-                    <span>#️⃣</span>
-                    <span>{watched.length} movies</span>
-                  </p>
-                  <p>
-                    <span>⭐️</span>
-                    <span>{avgImdbRating}</span>
-                  </p>
-                  <p>
-                    <span>🌟</span>
-                    <span>{avgUserRating}</span>
-                  </p>
-                  <p>
-                    <span>⏳</span>
-                    <span>{avgRuntime} min</span>
-                  </p>
-                </div>
-              </div>
+              <Summary movie={movies} average={average} watched={watched} />
 
               <ul className="list">
                 {watched.map((movie) => (
@@ -92,11 +77,40 @@ export default function App() {
                       </p>
                       <p>
                         <span>🌟</span>
-                        <span>{movie.userRating}</span>
+                        <span>{movie.Metascore}</span>
                       </p>
                       <p>
                         <span>⏳</span>
-                        <span>{movie.runtime} min</span>
+                        <span>{parseInt(movie.Runtime)} min</span>
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+        <div className="box">
+          <OverlayButton open={isOpen3} setOpen={setIsOpen3}></OverlayButton>
+          {isOpen3 && (
+            <>
+              <ul className="list">
+                {watched.map((movie) => (
+                  <li key={movie.imdbID}>
+                    <img src={movie.Poster} alt={`${movie.Title} poster`} />
+                    <h3>{movie.Title}</h3>
+                    <div>
+                      <p>
+                        <span>⭐️</span>
+                        <span>{movie.imdbRating}</span>
+                      </p>
+                      <p>
+                        <span>🌟</span>
+                        <span>{movie.Metascore}</span>
+                      </p>
+                      <p>
+                        <span>⏳</span>
+                        <span>{parseInt(movie.Runtime)} min</span>
                       </p>
                     </div>
                   </li>
