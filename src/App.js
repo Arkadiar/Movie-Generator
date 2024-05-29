@@ -3,6 +3,7 @@ import NavBar from "./components/NavBar";
 import OverlayButton from "./components/Button";
 import MovElementLi from "./components/MovElement";
 import Summary from "./components/summary";
+import BtnComponent from "./components/BtnComponent";
 // `http://www.omdbapi.com/?i=${responseJSON.Search.imdbID}&apikey=855effac`
 
 const average = (arr) =>
@@ -17,19 +18,28 @@ export default function App() {
   const [isOpen3, setIsOpen3] = useState(true);
   const [page, setPage] = useState(1);
 
-  const movieCaller = async () => {
+  let totResults = 0;
+
+  const movieCaller = async (signal) => {
     const url = `http://www.omdbapi.com/?s=${query}&page=${page}&apikey=855effac`;
 
-    if (query.length >= 3) {
-      const response = await fetch(url);
+    try {
+      const response = await fetch(url, { signal });
+      console.log(response);
       const responseJSON = await response.json();
 
       if (responseJSON.Search) {
         setMovies(responseJSON.Search);
         console.log(responseJSON);
+        totResults = responseJSON.totalResults;
+      }
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        console.error("Fetch error:", error);
       }
     }
   };
+  // console.log(totResults);
   function nextPage() {
     setPage((prevPage) => prevPage + 1);
   }
@@ -38,7 +48,11 @@ export default function App() {
   }
 
   useEffect(() => {
-    movieCaller(query);
+    const controller = new AbortController();
+    movieCaller(controller.signal);
+    return function () {
+      controller.abort();
+    };
   }, [query, page]);
 
   return (
@@ -57,24 +71,15 @@ export default function App() {
                   setWatched={setWatched}
                   key={i}
                   movie={movie}
+                  context="movies"
                 />
               ))}
               {movies.length === 0 ? (
                 ""
               ) : (
                 <div className="flex justify-between">
-                  <button
-                    onClick={() => prevPage()}
-                    className="text-2xl bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded "
-                  >
-                    Previous Page
-                  </button>
-                  <button
-                    onClick={() => nextPage()}
-                    className="text-2xl bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded "
-                  >
-                    Next Page
-                  </button>
+                  <BtnComponent onClick={prevPage}>Previous Page</BtnComponent>
+                  <BtnComponent onClick={nextPage}>Next Page</BtnComponent>
                 </div>
               )}
             </ul>
@@ -89,24 +94,13 @@ export default function App() {
 
               <ul className="list">
                 {watched.map((movie) => (
-                  <li key={movie.imdbID}>
-                    <img src={movie.Poster} alt={`${movie.Title} poster`} />
-                    <h3>{movie.Title}</h3>
-                    <div>
-                      <p>
-                        <span>⭐️</span>
-                        <span>{movie.imdbRating}</span>
-                      </p>
-                      <p>
-                        <span>🌟</span>
-                        <span>{movie.Metascore}</span>
-                      </p>
-                      <p>
-                        <span>⏳</span>
-                        <span>{parseInt(movie.Runtime)} min</span>
-                      </p>
-                    </div>
-                  </li>
+                  <MovElementLi
+                    key={movie.imdbID}
+                    movie={movie}
+                    watched={watched}
+                    setWatched={setWatched}
+                    context="watched"
+                  />
                 ))}
               </ul>
             </>
@@ -116,28 +110,7 @@ export default function App() {
           <OverlayButton open={isOpen3} setOpen={setIsOpen3}></OverlayButton>
           {isOpen3 && (
             <>
-              <ul className="list">
-                {watched.map((movie) => (
-                  <li key={movie.imdbID}>
-                    <img src={movie.Poster} alt={`${movie.Title} poster`} />
-                    <h3>{movie.Title}</h3>
-                    <div>
-                      <p>
-                        <span>⭐️</span>
-                        <span>{movie.imdbRating}</span>
-                      </p>
-                      <p>
-                        <span>🌟</span>
-                        <span>{movie.Metascore}</span>
-                      </p>
-                      <p>
-                        <span>⏳</span>
-                        <span>{parseInt(movie.Runtime)} min</span>
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              <ul className="list"></ul>
             </>
           )}
         </div>
