@@ -14,6 +14,7 @@
 - **Tailwind CSS Integration**: Utilized Tailwind CSS for easier and more consistent styling across the application.
 
 ### Upcoming Features
+- ##### Saving everything to local storage
 - **State Management for Pagination**: Implement state management to loop through all movies that match certain parameters using the API's pagination.
 - **Remove Watched Movies**: Allow users to remove movies from their watched list.
 - **Dynamic Movie Recommendations**: Re-generate the suggested movies list when the user adds or removes a movie.
