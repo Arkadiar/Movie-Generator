@@ -4,6 +4,8 @@ import OverlayButton from "./components/Button";
 import MovElementLi from "./components/MovElement";
 import Summary from "./components/summary";
 import BtnComponent from "./components/BtnComponent";
+import Modal from "./components/Modal";
+import { fetchRandomMovies } from "./utils/movieLogic";
 // `http://www.omdbapi.com/?i=${responseJSON.Search.imdbID}&apikey=855effac`
 
 const average = (arr) =>
@@ -17,6 +19,9 @@ export default function App() {
   const [isOpen2, setIsOpen2] = useState(true);
   const [isOpen3, setIsOpen3] = useState(true);
   const [page, setPage] = useState(1);
+  const [randomMovies, setRandomMovies] = useState([]);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [show, setShow] = useState(false);
 
   let totResults = 0;
 
@@ -30,7 +35,7 @@ export default function App() {
 
       if (responseJSON.Search) {
         setMovies(responseJSON.Search);
-        console.log(responseJSON);
+
         totResults = responseJSON.totalResults;
       }
     } catch (error) {
@@ -55,9 +60,26 @@ export default function App() {
     };
   }, [query, page]);
 
+  useEffect(() => {
+    const updateRandomMovies = async () => {
+      if (watched.length > 0) {
+        const randomMovies = await fetchRandomMovies(watched);
+        setRandomMovies(randomMovies);
+      }
+    };
+
+    updateRandomMovies();
+  }, [watched]);
+
   return (
     <>
-      <NavBar setPage={setPage} query={query} setQuery={setQuery}></NavBar>
+      <NavBar
+        setPage={setPage}
+        query={query}
+        setQuery={setQuery}
+        setShowInfoModal={setShowInfoModal}
+        setShow={setShow}
+      ></NavBar>
 
       <main className="main">
         <div className="box">
@@ -110,11 +132,31 @@ export default function App() {
           <OverlayButton open={isOpen3} setOpen={setIsOpen3}></OverlayButton>
           {isOpen3 && (
             <>
-              <ul className="list"></ul>
+              <>
+                <ul className="list">
+                  {randomMovies.map((movie) => (
+                    <MovElementLi
+                      context="random"
+                      watched={watched}
+                      setWatched={setWatched}
+                      key={movie.imdbID}
+                      movie={movie}
+                    />
+                  ))}
+                </ul>
+              </>
             </>
           )}
         </div>
       </main>
+      <Modal
+        showx={show}
+        show={showInfoModal}
+        onClose={() => {
+          setShowInfoModal(false);
+          setShow(false);
+        }}
+      />
     </>
   );
 }

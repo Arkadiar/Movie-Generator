@@ -1,5 +1,5 @@
 export default function NavBar(props) {
-  const { query, setQuery, setPage } = props;
+  const { query, setQuery, setPage, setShowInfoModal, setShow } = props;
   function evHandle(e) {
     setQuery(e.target.value);
     setPage(1);
@@ -17,9 +17,20 @@ export default function NavBar(props) {
         value={query}
         onChange={(e) => evHandle(e)}
       />
-      {/* <p className="num-results">
-        Found <strong>{movies.length}</strong> results
-      </p> */}
+      <button
+        onClick={() =>
+          setTimeout(() => {
+            setShowInfoModal(true);
+            setTimeout(() => {
+              setShow(true);
+            }, 2);
+          }, 1)
+        }
+        className="info-button"
+        aria-label="Info"
+      >
+        <span className="info-icon">I</span>
+      </button>
     </nav>
   );
 }
